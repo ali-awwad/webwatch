@@ -23,15 +23,15 @@ class CertificateResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\DateTimePicker::make('expires_at')
+                    ->required(),
                 Forms\Components\Repeater::make('sans')
+                    ->columnSpanFull()
                     ->schema([
                         Forms\Components\TextInput::make('domain')
                             ->required()
                             ->maxLength(255),
                     ])
-                    ->required()
-                    ->columns(1),
-                Forms\Components\DateTimePicker::make('expires_at')
                     ->required(),
             ]);
     }
@@ -43,13 +43,14 @@ class CertificateResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('sans')
-                    ->formatStateUsing(fn ($state) => implode(', ', $state))
+                    ->getStateUsing(fn ($record) => is_array($record->sans) ? count($record->sans) : $record->sans)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('expires_at')
-                    ->dateTime()
+                    ->dateTime('M j, Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('websites_count')
                     ->counts('websites')
+                    ->sortable()
                     ->label('Websites'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
@@ -85,4 +86,4 @@ class CertificateResource extends Resource
             'edit' => Pages\EditCertificate::route('/{record}/edit'),
         ];
     }
-} 
+}

@@ -27,6 +27,9 @@ class CheckResource extends Resource
                 Forms\Components\Select::make('status')
                     ->options(Status::class)
                     ->required(),
+                Forms\Components\Textarea::make('notes')
+                    ->maxLength(65535)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -38,6 +41,10 @@ class CheckResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
+                Tables\Columns\TextColumn::make('notes')
+                    ->searchable()
+                    ->limit(50)
+                    ->tooltip(fn(Tables\Columns\TextColumn $column): string => $column->getState() ?? ''),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),
@@ -72,4 +79,4 @@ class CheckResource extends Resource
             'edit' => Pages\EditCheck::route('/{record}/edit'),
         ];
     }
-} 
+}

@@ -22,9 +22,9 @@ class CertificateFactory extends Factory
         return [
             'name' => fake()->domainName(),
             'sans' => [
-                fake()->domainName(),
-                fake()->domainName(),
-                fake()->domainName(),
+                ['domain' => fake()->domainName()],
+                ['domain' => fake()->domainName()],
+                ['domain' => fake()->domainName()],
             ],
             'expires_at' => fake()->dateTimeBetween('now', '+2 years'),
         ];

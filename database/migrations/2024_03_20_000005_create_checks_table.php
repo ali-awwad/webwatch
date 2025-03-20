@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('website_id')->constrained()->cascadeOnDelete();
             $table->string('status');
+            $table->text('notes')->nullable();
             $table->timestamps();
         });
     }

@@ -24,6 +24,7 @@ class CheckFactory extends Factory
         return [
             'website_id' => Website::factory(),
             'status' => fake()->randomElement(Status::cases()),
+            'notes' => fake()->optional(0.7)->sentence(),
         ];
     }
 }
