@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Hosting;
 use App\Models\Website;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
@@ -12,8 +13,11 @@ class FindHosting extends Command
 
     public function handle()
     {
-        $websites = Website::all();
+        $websites = Website::get();
 
+        /**
+         * @var \App\Models\Website $website
+         */
         foreach ($websites as $website) {
             $domain = $website->domain;
             $this->info("Checking: $domain");
@@ -31,7 +35,14 @@ class FindHosting extends Command
                 $whoisResponse = Http::get("https://ipinfo.io/$ip/json")->json();
                 
                 if(isset($whoisResponse['org'])) {
-                    Website::whereDomain($domain)->update(['hosting_provider' => $whoisResponse['org']]);
+                    $hosting = Hosting::firstOrCreate([
+                        'org' => $whoisResponse['org'],
+                    ], [
+                        'name' => $whoisResponse['org'],
+                    ]);
+
+                    $website->hosting_id = $hosting->id;
+                    $website->save();
                 }
             } catch (\Exception $e) {
                 $this->error("Error checking $domain: " . $e->getMessage());
