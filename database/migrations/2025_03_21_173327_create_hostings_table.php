@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('hostings', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('org');
+            $table->timestamps();
+        });
+
+        Schema::table('websites', function (Blueprint $table) {
+            $table->foreignId('hosting_id')->nullable()->constrained('hostings');
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('websites', function (Blueprint $table) {
+            $table->dropForeign(['hosting_id']);
+            $table->dropColumn('hosting_id');
+        });
+
+        Schema::dropIfExists('hostings');
+    }
+};

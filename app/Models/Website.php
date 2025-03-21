@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,11 @@ class Website extends Model
 {
     use HasFactory;
     protected $guarded = ['id'];
+
+    protected $casts = [
+        'last_status' => Status::class,
+        'is_waf_enabled' => 'boolean',
+    ];
 
     public function company(): BelongsTo
     {
@@ -25,5 +31,10 @@ class Website extends Model
     public function checks(): HasMany
     {
         return $this->hasMany(Check::class);
+    }
+
+    public function hosting(): BelongsTo
+    {
+        return $this->belongsTo(Hosting::class);
     }
 } 

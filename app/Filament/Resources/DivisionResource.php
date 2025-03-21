@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\DivisionResource\Pages;
 use App\Models\Division;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -20,9 +21,13 @@ class DivisionResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
+                Section::make('Division Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                    ])
             ]);
     }
 

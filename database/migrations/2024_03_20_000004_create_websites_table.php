@@ -14,6 +14,12 @@ return new class extends Migration
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
             $table->string('last_status')->nullable();
             $table->foreignId('certificate_id')->nullable()->constrained()->nullOnDelete();
+            $table->string('developer_team')->nullable();
+            $table->string('tech_stack')->nullable();
+            $table->text('notes')->nullable();
+            $table->string('redirect_to')->nullable();
+            $table->boolean('is_waf_enabled')->nullable();
+
             $table->timestamps();
         });
     }

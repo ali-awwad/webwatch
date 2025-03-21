@@ -13,7 +13,8 @@ class Certificate extends Model
 
     protected $casts = [
         'sans' => 'array',
-        'expires_at' => 'datetime',
+        'valid_from' => 'datetime',
+        'valid_to' => 'datetime',
     ];
 
     public function websites(): HasMany

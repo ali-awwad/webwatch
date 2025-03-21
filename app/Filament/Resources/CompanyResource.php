@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -20,12 +21,16 @@ class CompanyResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('division_id')
-                    ->relationship('division', 'name')
-                    ->required(),
+                Section::make('Company Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Select::make('division_id')
+                            ->relationship('division', 'name')
+                            ->required(),
+                    ])
             ]);
     }
 
@@ -75,4 +80,4 @@ class CompanyResource extends Resource
             'edit' => Pages\EditCompany::route('/{record}/edit'),
         ];
     }
-} 
+}

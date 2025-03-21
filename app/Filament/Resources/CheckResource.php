@@ -27,6 +27,8 @@ class CheckResource extends Resource
                 Forms\Components\Select::make('status')
                     ->options(Status::class)
                     ->required(),
+                Forms\Components\TextInput::make('number_of_retries')
+                    ->default(0),
                 Forms\Components\Textarea::make('notes')
                     ->maxLength(65535)
                     ->columnSpanFull(),
@@ -45,10 +47,15 @@ class CheckResource extends Resource
                     ->searchable()
                     ->limit(50)
                     ->tooltip(fn(Tables\Columns\TextColumn $column): string => $column->getState() ?? ''),
+                Tables\Columns\TextColumn::make('number_of_retries')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                    //->dateTime('M j, Y')
+                    ->since()
+                    ->dateTimeTooltip()
                     ->sortable(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->filters([
                 Tables\Filters\SelectFilter::make('website')
                     ->relationship('website', 'domain'),

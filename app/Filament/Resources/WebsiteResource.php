@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\WebsiteResource\Pages;
 use App\Models\Website;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -20,15 +21,29 @@ class WebsiteResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('domain')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->required(),
-                Forms\Components\Select::make('certificate_id')
-                    ->relationship('certificate', 'name')
-                    ->nullable(),
+                Section::make('Website Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('domain')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
+                        Forms\Components\Select::make('certificate_id')
+                            ->relationship('certificate', 'name'),
+                        Forms\Components\TextInput::make('developer_team'),
+                        Forms\Components\Select::make('hosting.name')
+                            ->relationship('hosting', 'name')
+                            ->searchable(),
+                        Forms\Components\TextInput::make('redirect_to'),
+                        Forms\Components\Textarea::make('notes'),
+                        Forms\Components\ToggleButtons::make('is_waf_enabled')
+                            ->label('Is WAF Enabled')
+                            ->inline()
+                            ->boolean(),
+                        Forms\Components\TextInput::make('tech_stack'),
+                    ]),
             ]);
     }
 
@@ -40,18 +55,24 @@ class WebsiteResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('company.name')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('is_waf_enabled')
+                    ->badge(),
+                Tables\Columns\TextColumn::make('tech_stack')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('notes')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('certificate.name')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('hosting.name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('redirect_to')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('developer_team')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('last_status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'success' => 'success',
-                        'fail' => 'danger',
-                        'ssl_issue' => 'warning',
-                        'ssl_expired' => 'danger',
-                        'ssl_expiring_soon' => 'warning',
-                        default => 'gray',
-                    }),
+                    ->badge(),
                 Tables\Columns\TextColumn::make('checks_count')
                     ->counts('checks')
                     ->label('Checks'),
@@ -92,4 +113,4 @@ class WebsiteResource extends Resource
             'edit' => Pages\EditWebsite::route('/{record}/edit'),
         ];
     }
-} 
+}
