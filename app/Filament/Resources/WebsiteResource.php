@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\Status;
 use App\Filament\Resources\WebsiteResource\Pages;
 use App\Models\Website;
 use Filament\Forms;
@@ -86,6 +87,18 @@ class WebsiteResource extends Resource
                     ->relationship('company', 'name'),
                 Tables\Filters\SelectFilter::make('certificate')
                     ->relationship('certificate', 'name'),
+                Tables\Filters\SelectFilter::make('hosting')
+                    ->relationship('hosting', 'name'),
+                Tables\Filters\SelectFilter::make('last_status')
+                    ->options(Status::class),
+                Tables\Filters\SelectFilter::make('is_waf_enabled')
+                    ->options([
+                        true => 'Yes',
+                        false => 'No',
+                    ]),
+                
+                
+                
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -99,7 +99,7 @@ class CheckWebsites extends Command
         $website->redirect_to = $redirectTo;
         $website->notes = $notes;
         $website->save();
-        
+
         //number_of_retries
         // find last check
         $lastCheck = Check::whereWebsiteId($website->id)->latest()->first();
@@ -158,7 +158,8 @@ class CheckWebsites extends Command
             "http" => [
                 "method" => "GET",
                 "ignore_errors" => true,  // Ensure we get headers for non-200 responses
-                //"follow_location" => 0,
+                "follow_location" => 0,
+                "header" => "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36\r\n"
             ]
         ]);
 
