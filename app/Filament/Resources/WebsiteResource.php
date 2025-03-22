@@ -35,9 +35,6 @@ class WebsiteResource extends Resource
                             ->relationship('developerTeam', 'name')
                             ->label('Developer Team')
                             ->searchable(),
-                        Forms\Components\Select::make('hosting_id')
-                            ->relationship('hosting', 'name')
-                            ->searchable(),
                         Forms\Components\TextInput::make('redirect_to'),
                         Forms\Components\Textarea::make('notes'),
                         Forms\Components\ToggleButtons::make('is_waf_enabled')
@@ -91,11 +88,11 @@ class WebsiteResource extends Resource
                     ->toggleable()
                     ->tooltip(fn(Website $record): string => $record->certificates->pluck('name')->implode(', ') ?: 'N/A')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('hosting.name')
+                Tables\Columns\TextColumn::make('hostings.name')
                     ->limit(20)
                     ->sortable()
                     ->toggleable()
-                    ->tooltip(fn(Website $record): string => $record->hosting?->name ?? 'N/A')
+                    ->tooltip(fn(Website $record): string => $record->hostings->pluck('name')->implode(', '))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('redirect_to')
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -124,17 +121,30 @@ class WebsiteResource extends Resource
             ->filtersLayout(Tables\Enums\FiltersLayout::Modal)
             ->filters([
                 Tables\Filters\SelectFilter::make('company')
-                    ->relationship('company', 'name'),
+                    ->relationship('company', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
                 Tables\Filters\SelectFilter::make('certificates')
-                    ->relationship('certificates', 'name'),
-                Tables\Filters\SelectFilter::make('hosting')
-                    ->relationship('hosting', 'name'),
+                    ->relationship('certificates', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable(),
+                Tables\Filters\SelectFilter::make('hostings')
+                    ->searchable()
+                    ->multiple()
+                    ->preload()
+                    ->relationship('hostings', 'name'),
                 Tables\Filters\SelectFilter::make('developerTeam')
                     ->relationship('developerTeam', 'name')
+                    ->multiple()
+                    ->preload()
+                    ->searchable()
                     ->label('Developer Team'),
                 Tables\Filters\SelectFilter::make('techStacks')
                     ->relationship('techStacks', 'name')
                     ->multiple()
+                    ->searchable()
                     ->preload(),
                 Tables\Filters\SelectFilter::make('last_status')
                     ->multiple()
@@ -161,6 +171,8 @@ class WebsiteResource extends Resource
         return [
             WebsiteResource\RelationManagers\ChecksRelationManager::class,
             WebsiteResource\RelationManagers\VariationsRelationManager::class,
+            WebsiteResource\RelationManagers\CertificatesRelationManager::class,
+            WebsiteResource\RelationManagers\HostingsRelationManager::class,
         ];
     }
 

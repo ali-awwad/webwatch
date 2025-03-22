@@ -31,4 +31,9 @@ class Variation extends Model
     {
         return $this->belongsTo(Certificate::class);
     }
+
+    public function hosting(): BelongsTo
+    {
+        return $this->belongsTo(Hosting::class);
+    }
 } 

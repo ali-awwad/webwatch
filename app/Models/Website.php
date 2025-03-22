@@ -30,11 +30,6 @@ class Website extends Model
         return $this->hasManyThrough(Check::class, Variation::class);
     }
 
-    public function hosting(): BelongsTo
-    {
-        return $this->belongsTo(Hosting::class);
-    }
-
     public function developerTeam(): BelongsTo
     {
         return $this->belongsTo(DeveloperTeam::class);
@@ -48,7 +43,13 @@ class Website extends Model
     // Certificates (Variation has certificate_id and website_id)
     public function certificates(): HasManyThrough
     {
-        return $this->hasManyThrough(Certificate::class, Variation::class, 'website_id', 'id', 'id', 'certificate_id');
+        return $this->hasManyThrough(Certificate::class, Variation::class, 'website_id', 'id', 'id', 'certificate_id')->distinct();
+    }
+
+    // Hostings (Variation has hosting_id and website_id)
+    public function hostings(): HasManyThrough
+    {
+        return $this->hasManyThrough(Hosting::class, Variation::class, 'website_id', 'id', 'id', 'hosting_id')->distinct();
     }
 
 

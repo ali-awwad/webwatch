@@ -72,6 +72,7 @@ class HostingResource extends Resource
     {
         return [
             RelationManagers\WebsitesRelationManager::class,
+            RelationManagers\VariationsRelationManager::class,
         ];
     }
 

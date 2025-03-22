@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Hosting;
+use App\Models\Variation;
 use App\Models\Website;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
@@ -13,13 +14,13 @@ class FindHosting extends Command
 
     public function handle()
     {
-        $websites = Website::get();
+        $variations = Variation::get();
 
         /**
-         * @var \App\Models\Website $website
+         * @var \App\Models\Variation $variation
          */
-        foreach ($websites as $website) {
-            $domain = $website->domain;
+        foreach ($variations as $variation) {
+            $domain = $variation->name;
             $this->info("Checking: $domain");
 
             try {
@@ -41,8 +42,8 @@ class FindHosting extends Command
                         'name' => $whoisResponse['org'],
                     ]);
 
-                    $website->hosting_id = $hosting->id;
-                    $website->save();
+                    $variation->hosting_id = $hosting->id;
+                    $variation->save();
                 }
             } catch (\Exception $e) {
                 $this->error("Error checking $domain: " . $e->getMessage());

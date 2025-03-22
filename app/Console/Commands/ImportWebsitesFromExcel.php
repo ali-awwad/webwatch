@@ -138,10 +138,12 @@ class ImportWebsitesFromExcel extends Command
 
                 // create variation for the website
 
-                $variationNames = [
-                    $domain,
-                    'www.' . $domain,
-                ];
+                $variationNames = [$domain];
+                
+                // if is apex domain, add www. to the variation names
+                if (strpos($domain, '.') === strrpos($domain, '.')) {
+                    $variationNames[] = 'www.' . $domain;
+                }
 
                 foreach ($variationNames as $variationName) {
                     Variation::create([

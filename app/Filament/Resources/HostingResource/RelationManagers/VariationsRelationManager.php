@@ -1,22 +1,20 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\HostingResource\RelationManagers;
 
-use App\Filament\Resources\VariationResource\Pages;
-use App\Models\Variation;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Resources\Resource;
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class VariationResource extends Resource
+class VariationsRelationManager extends RelationManager
 {
-    protected static ?string $model = Variation::class;
+    protected static string $relationship = 'variations';
 
-    protected static ?string $navigationIcon = 'heroicon-o-square-3-stack-3d';
-
-    public static function form(Form $form): Form
+    public function form(Form $form): Form
     {
         return $form
             ->schema([
@@ -30,17 +28,15 @@ class VariationResource extends Resource
                 Forms\Components\Select::make('certificate_id')
                     ->relationship('certificate', 'name')
                     ->searchable(),
-                Forms\Components\Select::make('hosting_id')
-                    ->relationship('hosting', 'name')
-                    ->searchable(),
                 Forms\Components\Toggle::make('is_main')
                     ->required(),
             ]);
     }
 
-    public static function table(Table $table): Table
+    public function table(Table $table): Table
     {
         return $table
+            ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
@@ -49,16 +45,9 @@ class VariationResource extends Resource
                 Tables\Columns\TextColumn::make('certificate.name')
                     ->searchable()
                     ->toggleable(),
-                Tables\Columns\TextColumn::make('hosting.name')
-                    ->searchable()
-                    ->toggleable(),
                 Tables\Columns\IconColumn::make('is_main')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -66,9 +55,10 @@ class VariationResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('website')
                     ->relationship('website', 'domain'),
-                Tables\Filters\SelectFilter::make('hosting')
-                    ->relationship('hosting', 'name'),
                 Tables\Filters\TernaryFilter::make('is_main'),
+            ])
+            ->headerActions([
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -80,20 +70,4 @@ class VariationResource extends Resource
                 ]),
             ]);
     }
-
-    public static function getRelations(): array
-    {
-        return [
-            VariationResource\RelationManagers\ChecksRelationManager::class,
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListVariations::route('/'),
-            'create' => Pages\CreateVariation::route('/create'),
-            'edit' => Pages\EditVariation::route('/{record}/edit'),
-        ];
-    }
-} 
+}

@@ -1,27 +1,25 @@
 <?php
 
-namespace App\Filament\Resources\HostingResource\RelationManagers;
+namespace App\Filament\Resources\WebsiteResource\RelationManagers;
 
-use App\Models\Website;
+use App\Models\Hosting;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class WebsitesRelationManager extends RelationManager
+class HostingsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'websites';
+    protected static string $relationship = 'hostings';
 
-    // For this relationship to work, we need to query websites through variations
+    // We need to override the getTableQuery since the hostings are accessed through variations
     protected function getTableQuery(): Builder
     {
-        // Use the website relationships through variations
-        return Website::query()
+        return Hosting::query()
             ->whereHas('variations', function ($query) {
-                $query->where('hosting_id', $this->getOwnerRecord()->id);
+                $query->where('website_id', $this->getOwnerRecord()->id);
             })
             ->distinct();
     }
@@ -30,10 +28,12 @@ class WebsitesRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('domain')
+                Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-                // Since website no longer has direct hosting relationship, we don't need to include it
+                Forms\Components\TextInput::make('org')
+                    ->required()
+                    ->maxLength(255),
             ]);
     }
 
@@ -41,12 +41,10 @@ class WebsitesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('domain')
+                Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('last_status')
-                    ->badge(),
-                Tables\Columns\IconColumn::make('is_waf_enabled')
-                    ->boolean(),
+                Tables\Columns\TextColumn::make('org')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -56,14 +54,13 @@ class WebsitesRelationManager extends RelationManager
                 //
             ])
             ->headerActions([
-                // We can't directly create a website from hosting anymore
-                // The relation goes through Variation now
+                // View-only relation since website-hosting relationship is now through variations
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
             ])
             ->bulkActions([
-                // Since it's not a direct relationship, we don't need bulk actions
+                // No bulk actions for this view-only relation
             ]);
     }
 } 
