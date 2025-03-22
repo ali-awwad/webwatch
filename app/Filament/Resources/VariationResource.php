@@ -70,7 +70,7 @@ class VariationResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            VariationResource\RelationManagers\ChecksRelationManager::class,
         ];
     }
 
