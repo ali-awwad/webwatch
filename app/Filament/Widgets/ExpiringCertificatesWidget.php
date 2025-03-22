@@ -20,22 +20,23 @@ class ExpiringCertificatesWidget extends BaseWidget
             ->description('SSL certificates that are about to expire or already expired')
             ->query(
                 Certificate::query()
-                    ->where('expires_at', '<=', now()->addDays(30000))
-                    ->orderBy('expires_at')
+                    ->where('valid_to', '<=', now()->addDays(30000))
+                    ->orderBy('valid_to')
                     ->limit(5)
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('expires_at')
+                Tables\Columns\TextColumn::make('valid_to')
                     ->dateTime('d M Y')
                     ->sortable()
                     ->badge()
-                    ->color(fn ($record) => 
-                        $record->expires_at->isPast()
+                    ->color(
+                        fn($record) =>
+                        $record->valid_to->isPast()
                             ? 'danger'
-                            : ($record->expires_at->diffInDays(now()) <= 7 
-                                ? 'danger' 
+                            : ($record->valid_to->diffInDays(now()) <= 7
+                                ? 'danger'
                                 : 'warning'
                             )
                     ),
@@ -51,4 +52,4 @@ class ExpiringCertificatesWidget extends BaseWidget
             ])
             ->paginated(false);
     }
-} 
+}

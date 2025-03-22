@@ -11,11 +11,11 @@ return new class extends Migration
         Schema::create('certificates', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('organization');
-            $table->string('issuer');
-            $table->timestamp('valid_from');
-            $table->timestamp('valid_to');
-            $table->json('sans');
+            $table->string('organization')->nullable();
+            $table->string('issuer')->nullable();
+            $table->timestamp('valid_from')->nullable();
+            $table->timestamp('valid_to')->nullable();
+            $table->json('sans')->nullable();
             $table->timestamps();
         });
     }

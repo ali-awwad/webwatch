@@ -26,7 +26,7 @@ class CertificateFactory extends Factory
                 ['domain' => fake()->domainName()],
                 ['domain' => fake()->domainName()],
             ],
-            'expires_at' => fake()->dateTimeBetween('now', '+2 years'),
+            'valid_to' => fake()->dateTimeBetween('now', '+2 years'),
         ];
     }
 }

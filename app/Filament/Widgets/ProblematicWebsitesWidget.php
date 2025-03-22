@@ -23,7 +23,7 @@ class ProblematicWebsitesWidget extends BaseWidget
             ->description('Websites with status issues')
             ->query(
                 Website::query()
-                    ->whereNotIn('last_status', [Status::UP->value])
+                    ->whereNotIn('last_status', [Status::UP->value, Status::REDIRECT->value])
                     ->latest('updated_at')
             )
             ->columns([

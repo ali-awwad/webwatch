@@ -17,6 +17,7 @@ enum Status: string implements HasIcon, HasColor
     case SSL_ISSUE = 'ssl_issue';
     case SSL_EXPIRED = 'ssl_expired';
     case SSL_EXPIRING_SOON = 'ssl_expiring_soon';
+    case FORBIDDEN = 'forbidden';
 
     public function getIcon(): string
     {
@@ -29,6 +30,7 @@ enum Status: string implements HasIcon, HasColor
             self::REDIRECT => 'heroicon-o-arrow-right',
             self::UNKNOWN => 'heroicon-o-question-mark-circle',
             self::NOT_FOUND => 'heroicon-o-x-circle',
+            self::FORBIDDEN => 'heroicon-o-x-circle',
         };
     }
 
@@ -43,6 +45,7 @@ enum Status: string implements HasIcon, HasColor
             self::REDIRECT => 'success',
             self::UNKNOWN => 'warning',
             self::NOT_FOUND => 'danger',
+            self::FORBIDDEN => 'danger',
         };
     }
 } 

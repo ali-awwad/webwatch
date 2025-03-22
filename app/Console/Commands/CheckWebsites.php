@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use App\DTOs\SslCertificateDTO;
 use App\Models\Certificate;
+use Illuminate\Support\Str;
 
 class CheckWebsites extends Command
 {
@@ -26,12 +27,15 @@ class CheckWebsites extends Command
         $bar->start();
 
         foreach ($websites as $website) {
+            $domain = Str::endsWith($website->domain, '/') ? $website->domain : $website->domain.'/';
+
             DB::beginTransaction();
             try {
                 $this->newLine();
-                $this->info("Checking website {$website->domain}");
-                $httpStatus = $this->getHttpStatusWithStream($website->domain);
-                $certInfo = $this->getSslCertificateDetails($website->domain);
+                $this->info("Checking website {$domain}");
+                $httpStatusWithRedirect = $this->getHttpStatusWithStream($domain);
+                $this->info('HTTP status with redirect: '.json_encode($httpStatusWithRedirect));
+                $certInfo = $this->getSslCertificateDetails($website->domain); // keep the domain as is
 
                 $certificate = Certificate::updateOrCreate(
                     ['name' => $certInfo->commonName],
@@ -44,19 +48,14 @@ class CheckWebsites extends Command
                     ]
                 );
 
-                $status = match ($httpStatus) {
-                    200 => Status::UP,
-                    301 => Status::REDIRECT,
-                    302 => Status::REDIRECT,
-                    404 => Status::NOT_FOUND,
-                    500 => Status::DOWN,
-                    default => Status::UNKNOWN,
-                };
+                
+                $this->newLine();
+                $this->info('Status: '.$httpStatusWithRedirect['status']);
 
-                $this->createCheck($website, $status, $certificate, null);
+                $this->createCheck($website, $httpStatusWithRedirect, $certificate, null);
             } catch (\Exception $e) {
                 $this->error("Failed to check website {$website->domain}: {$e->getMessage()}");
-                $status = strpos($e->getMessage(), 'SSL') !== false ? Status::SSL_ISSUE : Status::UNKNOWN;
+                $status = strpos($e->getMessage(), 'SSL') !== false ? Status::SSL_ISSUE : Status::DOWN;
                 $this->createCheck($website, $status, null, $e->getMessage());
             }
 
@@ -70,25 +69,37 @@ class CheckWebsites extends Command
         $this->info('Website checks completed!');
     }
 
-    private function getRedirectTo($domain): string|null
-    {
-        $response = Http::withoutVerifying()->get($domain);
-        return $response->header('Location');
-    }
-
-    private function createCheck(Website $website, Status $status, Certificate|null $certificate, string|null $errorMessage)
+    private function createCheck(Website $website, Status|array $status, Certificate|null $certificate, string|null $errorMessage)
     {
         $redirectTo = null;
-        // make it recursive
-        if ($status === Status::REDIRECT) {
-            $redirectTo = $this->getRedirectTo($website->domain);
+        $notes = null;
+        if(is_array($status)) {
+            if(isset($status['redirect_to']) && $status['redirect_to'] !== null) {
+                // if Location is http not then make a note
+                if(str_starts_with($status['redirect_to'], 'http://')) {
+                    // note with alert emoji
+                    $notes = '🚨 Redirect to http';
+                }
+                $redirectTo = Str::afterLast($status['redirect_to'], 'https://');
+                $redirectTo = rtrim($redirectTo, '/');
+            }
+            $status = match ($status['status']) {
+                200 => Status::UP,
+                301 => Status::REDIRECT,
+                302 => Status::REDIRECT,
+                404 => Status::NOT_FOUND,
+                500 => Status::DOWN,
+                403 => Status::FORBIDDEN,
+                default => Status::UNKNOWN,
+            };
         }
 
         $website->certificate_id = $certificate?->id;
         $website->last_status = $status->value;
         $website->redirect_to = $redirectTo;
+        $website->notes = $notes;
         $website->save();
-
+        
         //number_of_retries
         // find last check
         $lastCheck = Check::whereWebsiteId($website->id)->latest()->first();
@@ -141,19 +152,23 @@ class CheckWebsites extends Command
     }
 
 
-    private function getHttpStatusWithStream($domain): int|string
+    private function getHttpStatusWithStream($domain): array
     {
         $context = stream_context_create([
             "http" => [
                 "method" => "GET",
                 "ignore_errors" => true,  // Ensure we get headers for non-200 responses
+                //"follow_location" => 0,
             ]
         ]);
 
         $handle = @fopen("https://$domain", "r", false, $context);
 
         if ($handle === false) {
-            return "Failed to open connection";
+            return [
+                'status' => 'Failed to open connection',
+                'redirect_to' => null,
+            ];
         }
 
         $metaData = stream_get_meta_data($handle);
@@ -161,9 +176,16 @@ class CheckWebsites extends Command
 
         if (isset($metaData["wrapper_data"][0])) {
             preg_match('/\d{3}/', $metaData["wrapper_data"][0], $matches);
-            return (int)$matches[0] ?? "Unknown";
+            return [
+                'status' => (int)$matches[0] ?? "Unknown",
+                // find "location" in metaData["wrapper_data"]
+                'redirect_to' => collect($metaData["wrapper_data"])->first(fn ($item) => str_contains($item, 'Location:')) ?? null,
+            ];
         }
 
-        return "Failed to retrieve status";
+        return [
+            'status' => "Failed to retrieve status",
+            'redirect_to' => null,
+        ];
     }
 }
