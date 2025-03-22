@@ -34,11 +34,17 @@ class ChecksRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
+                Tables\Columns\TextColumn::make('variation.name')
+                    ->label('Variation'),
+                Tables\Columns\TextColumn::make('certificate.common_name')
+                    ->label('Certificate'),
                 Tables\Columns\TextColumn::make('notes')
+                    ->tooltip(fn ($state) => $state)
                     ->limit(50),
                 Tables\Columns\TextColumn::make('number_of_retries'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->since()
+                    ->dateTimeTooltip()
                     ->sortable(),
             ])
             ->filters([
