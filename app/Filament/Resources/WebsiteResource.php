@@ -33,8 +33,11 @@ class WebsiteResource extends Resource
                             ->required(),
                         Forms\Components\Select::make('certificate_id')
                             ->relationship('certificate', 'name'),
-                        Forms\Components\TextInput::make('developer_team'),
-                        Forms\Components\Select::make('hosting.name')
+                        Forms\Components\Select::make('developer_team_id')
+                            ->relationship('developerTeam', 'name')
+                            ->label('Developer Team')
+                            ->searchable(),
+                        Forms\Components\Select::make('hosting_id')
                             ->relationship('hosting', 'name')
                             ->searchable(),
                         Forms\Components\TextInput::make('redirect_to'),
@@ -43,7 +46,11 @@ class WebsiteResource extends Resource
                             ->label('Is WAF Enabled')
                             ->inline()
                             ->boolean(),
-                        Forms\Components\TextInput::make('tech_stack'),
+                        Forms\Components\Select::make('techStacks')
+                            ->relationship('techStacks', 'name')
+                            ->multiple()
+                            ->preload()
+                            ->searchable(),
                     ]),
             ]);
     }
@@ -58,7 +65,8 @@ class WebsiteResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('is_waf_enabled')
                     ->badge(),
-                Tables\Columns\TextColumn::make('tech_stack')
+                Tables\Columns\TextColumn::make('techStacks.name')
+                    ->badge()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('notes')
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -70,7 +78,7 @@ class WebsiteResource extends Resource
                 Tables\Columns\TextColumn::make('redirect_to')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('developer_team')
+                Tables\Columns\TextColumn::make('developerTeam.name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('last_status')
                     ->badge(),
@@ -89,6 +97,13 @@ class WebsiteResource extends Resource
                     ->relationship('certificate', 'name'),
                 Tables\Filters\SelectFilter::make('hosting')
                     ->relationship('hosting', 'name'),
+                Tables\Filters\SelectFilter::make('developerTeam')
+                    ->relationship('developerTeam', 'name')
+                    ->label('Developer Team'),
+                Tables\Filters\SelectFilter::make('techStacks')
+                    ->relationship('techStacks', 'name')
+                    ->multiple()
+                    ->preload(),
                 Tables\Filters\SelectFilter::make('last_status')
                     ->options(Status::class),
                 Tables\Filters\SelectFilter::make('is_waf_enabled')
@@ -96,9 +111,6 @@ class WebsiteResource extends Resource
                         true => 'Yes',
                         false => 'No',
                     ]),
-                
-                
-                
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

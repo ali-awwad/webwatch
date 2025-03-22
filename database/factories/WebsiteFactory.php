@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Enums\Status;
 use App\Models\Company;
 use App\Models\Certificate;
+use App\Models\DeveloperTeam;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,6 +25,7 @@ class WebsiteFactory extends Factory
             'company_id' => Company::factory(),
             'last_status' => fake()->randomElement(Status::cases()),
             'certificate_id' => Certificate::factory(),
+            'developer_team_id' => DeveloperTeam::factory(),
         ];
     }
 }

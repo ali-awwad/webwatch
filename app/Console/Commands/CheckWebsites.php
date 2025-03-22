@@ -90,6 +90,7 @@ class CheckWebsites extends Command
                 404 => Status::NOT_FOUND,
                 500 => Status::DOWN,
                 403 => Status::FORBIDDEN,
+                'Failed to open connection' => Status::DOWN,
                 default => Status::UNKNOWN,
             };
         }
@@ -120,7 +121,7 @@ class CheckWebsites extends Command
         else {
             Check::create([
                 'website_id' => $website->id,
-                'status' => $status,
+                'status' => $status->value,
                 'number_of_retries' => 0,
                 'notes' => $errorMessage,
             ]);
