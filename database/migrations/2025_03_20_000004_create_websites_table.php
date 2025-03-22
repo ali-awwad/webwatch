@@ -16,7 +16,6 @@ return new class extends Migration
             $table->foreignId('certificate_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('developer_team_id')->nullable()->constrained()->nullOnDelete();
             $table->text('notes')->nullable();
-            $table->string('redirect_to')->nullable();
             $table->boolean('is_waf_enabled')->nullable();
 
             $table->timestamps();

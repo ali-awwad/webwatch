@@ -33,6 +33,8 @@ class VariationResource extends Resource
                 Forms\Components\Select::make('hosting_id')
                     ->relationship('hosting', 'name')
                     ->searchable(),
+                Forms\Components\TextInput::make('redirect_to')
+                    ->maxLength(255),
                 Forms\Components\Toggle::make('is_main')
                     ->required(),
             ]);
@@ -52,6 +54,11 @@ class VariationResource extends Resource
                 Tables\Columns\TextColumn::make('hosting.name')
                     ->searchable()
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('redirect_to')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->limit(20)
+                    ->tooltip(fn(Variation $record): string => $record->redirect_to ?? 'N/A')
+                    ->searchable(),
                 Tables\Columns\IconColumn::make('is_main')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')

@@ -23,6 +23,7 @@ class VariationFactory extends Factory
             'website_id' => Website::factory(),
             'is_main' => fake()->boolean(),
             'certificate_id' => fake()->boolean(30) ? Certificate::factory() : null,
+            'redirect_to' => fake()->boolean(20) ? fake()->url() : null,
         ];
     }
     

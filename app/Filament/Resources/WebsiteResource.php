@@ -38,7 +38,6 @@ class WebsiteResource extends Resource
                             ->relationship('developerTeam', 'name')
                             ->label('Developer Team')
                             ->searchable(),
-                        Forms\Components\TextInput::make('redirect_to'),
                         Forms\Components\Textarea::make('notes'),
                         Forms\Components\ToggleButtons::make('is_waf_enabled')
                             ->label('Is WAF Enabled')
@@ -105,11 +104,6 @@ class WebsiteResource extends Resource
                     ->toggleable()
                     ->tooltip(fn(Website $record): string => $record->hostings->pluck('name')->implode(', '))
                     ,
-                Tables\Columns\TextColumn::make('redirect_to')
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->limit(20)
-                    ->tooltip(fn(Website $record): string => $record->redirect_to ?? 'N/A')
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('developerTeam.name')
                     ->limit(20)
                     ->sortable()

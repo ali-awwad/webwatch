@@ -13,6 +13,7 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('website_id')->constrained()->cascadeOnDelete();
             $table->boolean('is_main')->default(false);
+            $table->string('redirect_to')->nullable();
             $table->timestamps();
         });
     }
