@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Filament\Resources\TechStackResource\RelationManagers;
 
 class TechStackResource extends Resource
 {
@@ -64,6 +65,13 @@ class TechStackResource extends Resource
             'index' => Pages\ListTechStacks::route('/'),
             'create' => Pages\CreateTechStack::route('/create'),
             'edit' => Pages\EditTechStack::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\WebsitesRelationManager::make(),
         ];
     }
 } 

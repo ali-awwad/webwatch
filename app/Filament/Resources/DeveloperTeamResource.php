@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Filament\Resources\DeveloperTeamResource\RelationManagers;
 
 class DeveloperTeamResource extends Resource
 {
@@ -64,6 +65,13 @@ class DeveloperTeamResource extends Resource
             'index' => Pages\ListDeveloperTeams::route('/'),
             'create' => Pages\CreateDeveloperTeam::route('/create'),
             'edit' => Pages\EditDeveloperTeam::route('/{record}/edit'),
+        ];
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\WebsitesRelationManager::make(),
         ];
     }
 } 

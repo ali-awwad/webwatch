@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Filament\Resources\DivisionResource\RelationManagers;
 
 class DivisionResource extends Resource
 {
@@ -62,7 +63,8 @@ class DivisionResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\CompaniesRelationManager::make(),
+            RelationManagers\WebsitesRelationManager::make(),
         ];
     }
 

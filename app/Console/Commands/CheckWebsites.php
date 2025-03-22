@@ -98,7 +98,9 @@ class CheckWebsites extends Command
         $website->certificate_id = $certificate?->id;
         $website->last_status = $status->value;
         $website->redirect_to = $redirectTo;
-        $website->notes = $notes;
+        if($notes) {
+            $website->notes = $notes;
+        }
         $website->save();
 
         //number_of_retries

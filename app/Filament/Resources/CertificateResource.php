@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Filament\Resources\CertificateResource\RelationManagers;
 
 class CertificateResource extends Resource
 {
@@ -20,28 +21,32 @@ class CertificateResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('valid_from')
-                    ->required(),
-                Forms\Components\DateTimePicker::make('valid_to')
-                    ->required(),
-                Forms\Components\TextInput::make('organization')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('issuer')
-                    ->required()
-                    ->maxLength(255),
-                    
-                Forms\Components\Repeater::make('sans')
-                    ->columnSpanFull()
+                // Certificate Information
+                Forms\Components\Section::make('Certificate Information')
                     ->schema([
-                        Forms\Components\TextInput::make('domain')
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\DateTimePicker::make('valid_from')
+                            ->required(),
+                        Forms\Components\DateTimePicker::make('valid_to')
+                            ->required(),
+                        Forms\Components\TextInput::make('organization')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('issuer')
                             ->required()
                             ->maxLength(255),
                     ])
-                    ->required(),
+                    ->columns(2),
+
+                // SANs
+                Forms\Components\Section::make('SANs')
+                    ->collapsed()
+                    ->schema([
+                        Forms\Components\Repeater::make('sans')
+                            ->columnSpanFull()
+                    ])
             ]);
     }
 
@@ -52,7 +57,7 @@ class CertificateResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('sans')
-                    ->getStateUsing(fn ($record) => is_array($record->sans) ? count($record->sans) : $record->sans)
+                    ->getStateUsing(fn($record) => is_array($record->sans) ? count($record->sans) : $record->sans)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('valid_from')
                     ->dateTime('M j, Y')
@@ -63,11 +68,11 @@ class CertificateResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('organization')
                     ->limit(20)
-                    ->tooltip(fn ($record) => $record->organization)
+                    ->tooltip(fn($record) => $record->organization)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('issuer')
                     ->limit(20)
-                    ->tooltip(fn ($record) => $record->issuer)
+                    ->tooltip(fn($record) => $record->issuer)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('websites.domain')
                     ->label('Used on')
@@ -100,7 +105,7 @@ class CertificateResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\WebsitesRelationManager::make(),
         ];
     }
 
