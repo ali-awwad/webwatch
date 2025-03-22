@@ -60,36 +60,70 @@ class WebsiteResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('domain')
+                    ->limit(30)
+                    ->sortable()
+                    ->tooltip(fn(Website $record): string => $record->domain)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('company.name')
+                    ->limit(20)
+                    ->sortable()
+                    ->toggleable()
+                    ->tooltip(fn(Website $record): string => $record->company->name)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('is_waf_enabled')
-                    ->badge(),
+                Tables\Columns\TextColumn::make('last_status')
+                    ->badge()
+                    ->sortable()
+                    ->toggleable(),
+                Tables\Columns\IconColumn::make('is_waf_enabled')
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('techStacks.name')
                     ->badge()
+                    ->limit(20)
+                    ->sortable()
+                    ->toggleable()
+                    ->tooltip(fn(Website $record): string => $record->techStacks->pluck('name')->implode(', '))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('notes')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('certificate.name')
+                    ->limit(20)
+                    ->sortable()
+                    ->toggleable()
+                    ->tooltip(fn(Website $record): string => $record->certificate?->name ?? 'N/A')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('hosting.name')
+                    ->limit(20)
+                    ->sortable()
+                    ->toggleable()
+                    ->tooltip(fn(Website $record): string => $record->hosting?->name ?? 'N/A')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('redirect_to')
                     ->toggleable(isToggledHiddenByDefault: true)
+                    ->limit(20)
+                    ->tooltip(fn(Website $record): string => $record->redirect_to ?? 'N/A')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('developerTeam.name')
+                    ->limit(20)
+                    ->sortable()
+                    ->toggleable()
+                    ->tooltip(fn(Website $record): string => $record->developerTeam?->name ?? 'N/A')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('last_status')
-                    ->badge(),
+
                 Tables\Columns\TextColumn::make('checks_count')
                     ->counts('checks')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
                     ->label('Checks'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->persistFiltersInSession()
+            ->filtersFormColumns(2)
+            ->filtersLayout(Tables\Enums\FiltersLayout::Modal)
             ->filters([
                 Tables\Filters\SelectFilter::make('company')
                     ->relationship('company', 'name'),
@@ -105,6 +139,7 @@ class WebsiteResource extends Resource
                     ->multiple()
                     ->preload(),
                 Tables\Filters\SelectFilter::make('last_status')
+                    ->multiple()
                     ->options(Status::class),
                 Tables\Filters\SelectFilter::make('is_waf_enabled')
                     ->options([
@@ -126,7 +161,8 @@ class WebsiteResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            WebsiteResource\RelationManagers\ChecksRelationManager::class,
+            WebsiteResource\RelationManagers\VariationsRelationManager::class,
         ];
     }
 

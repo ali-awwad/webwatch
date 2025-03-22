@@ -16,8 +16,13 @@ class Check extends Model
         'status' => Status::class,
     ];
 
-    public function website(): BelongsTo
+    public function variation(): BelongsTo
     {
-        return $this->belongsTo(Website::class);
+        return $this->belongsTo(Variation::class);
+    }
+    
+    public function website()
+    {
+        return $this->variation->website();
     }
 } 

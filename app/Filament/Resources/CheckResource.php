@@ -21,9 +21,11 @@ class CheckResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('website_id')
-                    ->relationship('website', 'domain')
-                    ->required(),
+                Forms\Components\Select::make('variation_id')
+                    ->relationship('variation', 'name')
+                    ->required()
+                    ->searchable()
+                    ->preload(),
                 Forms\Components\Select::make('status')
                     ->options(Status::class)
                     ->required(),
@@ -39,7 +41,9 @@ class CheckResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('website.domain')
+                Tables\Columns\TextColumn::make('variation.name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('variation.website.domain')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
@@ -57,8 +61,10 @@ class CheckResource extends Resource
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
+                Tables\Filters\SelectFilter::make('variation')
+                    ->relationship('variation', 'name'),
                 Tables\Filters\SelectFilter::make('website')
-                    ->relationship('website', 'domain'),
+                    ->relationship('variation.website', 'domain'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -2,20 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\TechStackResource\Pages;
-use App\Models\TechStack;
+use App\Filament\Resources\VariationResource\Pages;
+use App\Models\Variation;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Filament\Resources\TechStackResource\RelationManagers;
 
-class TechStackResource extends Resource
+class VariationResource extends Resource
 {
-    protected static ?string $model = TechStack::class;
+    protected static ?string $model = Variation::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-code-bracket';
+    protected static ?string $navigationIcon = 'heroicon-o-square-3-stack-3d';
 
     public static function form(Form $form): Form
     {
@@ -24,6 +23,12 @@ class TechStackResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Select::make('website_id')
+                    ->relationship('website', 'domain')
+                    ->required()
+                    ->searchable(),
+                Forms\Components\Toggle::make('is_main')
+                    ->required(),
             ]);
     }
 
@@ -32,12 +37,11 @@ class TechStackResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('websites_count')
-                    ->counts('websites')
-                    ->sortable()
-                    ->label('Websites'),
+                Tables\Columns\TextColumn::make('website.domain')
+                    ->searchable(),
+                Tables\Columns\IconColumn::make('is_main')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -47,9 +51,10 @@ class TechStackResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->defaultSort('websites_count', 'desc')
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('website')
+                    ->relationship('website', 'domain'),
+                Tables\Filters\TernaryFilter::make('is_main'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -62,19 +67,19 @@ class TechStackResource extends Resource
             ]);
     }
 
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListTechStacks::route('/'),
-            'create' => Pages\CreateTechStack::route('/create'),
-            'edit' => Pages\EditTechStack::route('/{record}/edit'),
-        ];
-    }
-
     public static function getRelations(): array
     {
         return [
-            RelationManagers\WebsitesRelationManager::make(),
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListVariations::route('/'),
+            'create' => Pages\CreateVariation::route('/create'),
+            'edit' => Pages\EditVariation::route('/{record}/edit'),
         ];
     }
 } 

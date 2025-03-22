@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Check;
-use App\Models\Website;
 use App\Enums\Status;
+use App\Models\Variation;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,7 +22,7 @@ class CheckFactory extends Factory
     public function definition(): array
     {
         return [
-            'website_id' => Website::factory(),
+            'variation_id' => Variation::factory(),
             'status' => fake()->randomElement(Status::cases()),
             'notes' => fake()->optional(0.7)->sentence(),
         ];
