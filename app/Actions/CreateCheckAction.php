@@ -38,8 +38,6 @@ class CreateCheckAction
         }
 
         $website = $variation->website;
-
-        $website->certificate_id = $certificate?->id;
         $website->last_status = $status->value;
         $website->redirect_to = $redirectTo;
         if($notes) {

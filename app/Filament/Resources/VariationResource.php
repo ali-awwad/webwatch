@@ -27,6 +27,9 @@ class VariationResource extends Resource
                     ->relationship('website', 'domain')
                     ->required()
                     ->searchable(),
+                Forms\Components\Select::make('certificate_id')
+                    ->relationship('certificate', 'name')
+                    ->searchable(),
                 Forms\Components\Toggle::make('is_main')
                     ->required(),
             ]);
@@ -40,6 +43,9 @@ class VariationResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('website.domain')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('certificate.name')
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\IconColumn::make('is_main')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')

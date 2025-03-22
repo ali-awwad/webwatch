@@ -19,6 +19,9 @@ class VariationsRelationManager extends RelationManager
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Select::make('certificate_id')
+                    ->relationship('certificate', 'name')
+                    ->searchable(),
                 Forms\Components\Toggle::make('is_main')
                     ->required(),
             ]);
@@ -31,6 +34,9 @@ class VariationsRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('certificate.name')
+                    ->searchable()
+                    ->toggleable(),
                 Tables\Columns\IconColumn::make('is_main')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')

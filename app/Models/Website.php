@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+
 class Website extends Model
 {
     use HasFactory;
@@ -24,11 +25,6 @@ class Website extends Model
         return $this->belongsTo(Company::class);
     }
 
-    public function certificate(): BelongsTo
-    {
-        return $this->belongsTo(Certificate::class);
-    }
-
     public function checks(): HasManyThrough
     {
         return $this->hasManyThrough(Check::class, Variation::class);
@@ -38,19 +34,26 @@ class Website extends Model
     {
         return $this->belongsTo(Hosting::class);
     }
-    
+
     public function developerTeam(): BelongsTo
     {
         return $this->belongsTo(DeveloperTeam::class);
     }
-    
+
     public function variations(): HasMany
     {
         return $this->hasMany(Variation::class);
     }
-    
+
+    // Certificates (Variation has certificate_id and website_id)
+    public function certificates(): HasManyThrough
+    {
+        return $this->hasManyThrough(Certificate::class, Variation::class, 'website_id', 'id', 'id', 'certificate_id');
+    }
+
+
     public function techStacks(): BelongsToMany
     {
         return $this->belongsToMany(TechStack::class);
     }
-} 
+}

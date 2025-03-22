@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Website;
+use App\Models\Certificate;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,6 +22,7 @@ class VariationFactory extends Factory
             'name' => fake()->word(),
             'website_id' => Website::factory(),
             'is_main' => fake()->boolean(),
+            'certificate_id' => fake()->boolean(30) ? Certificate::factory() : null,
         ];
     }
     
@@ -31,6 +33,16 @@ class VariationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_main' => true,
+        ]);
+    }
+    
+    /**
+     * Indicate that the variation has a certificate.
+     */
+    public function withCertificate(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'certificate_id' => Certificate::factory(),
         ]);
     }
 } 

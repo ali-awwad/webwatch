@@ -31,8 +31,6 @@ class WebsiteResource extends Resource
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
                             ->required(),
-                        Forms\Components\Select::make('certificate_id')
-                            ->relationship('certificate', 'name'),
                         Forms\Components\Select::make('developer_team_id')
                             ->relationship('developerTeam', 'name')
                             ->label('Developer Team')
@@ -87,11 +85,11 @@ class WebsiteResource extends Resource
                 Tables\Columns\TextColumn::make('notes')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('certificate.name')
+                Tables\Columns\TextColumn::make('certificates.name')
                     ->limit(20)
                     ->sortable()
                     ->toggleable()
-                    ->tooltip(fn(Website $record): string => $record->certificate?->name ?? 'N/A')
+                    ->tooltip(fn(Website $record): string => $record->certificates->pluck('name')->implode(', ') ?: 'N/A')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('hosting.name')
                     ->limit(20)
@@ -127,8 +125,8 @@ class WebsiteResource extends Resource
             ->filters([
                 Tables\Filters\SelectFilter::make('company')
                     ->relationship('company', 'name'),
-                Tables\Filters\SelectFilter::make('certificate')
-                    ->relationship('certificate', 'name'),
+                Tables\Filters\SelectFilter::make('certificates')
+                    ->relationship('certificates', 'name'),
                 Tables\Filters\SelectFilter::make('hosting')
                     ->relationship('hosting', 'name'),
                 Tables\Filters\SelectFilter::make('developerTeam')

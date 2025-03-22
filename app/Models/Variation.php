@@ -26,4 +26,9 @@ class Variation extends Model
     {
         return $this->hasMany(Check::class);
     }
+    
+    public function certificate(): BelongsTo
+    {
+        return $this->belongsTo(Certificate::class);
+    }
 } 

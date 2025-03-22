@@ -52,6 +52,9 @@ class CheckWebsites extends Command
                 $this->newLine();
                 $this->info('Status: '.$httpStatusWithRedirect->status);
 
+                $variation->certificate_id = $certificate->id;
+                $variation->save();
+
                 CreateCheckAction::execute($variation, $httpStatusWithRedirect, $certificate, null);
 
             } catch (\Exception $e) {

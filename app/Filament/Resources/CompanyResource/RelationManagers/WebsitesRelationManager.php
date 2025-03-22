@@ -20,8 +20,6 @@ class WebsitesRelationManager extends RelationManager
                 Forms\Components\TextInput::make('domain')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Select::make('certificate_id')
-                    ->relationship('certificate', 'name'),
                 Forms\Components\Select::make('developer_team_id')
                     ->relationship('developerTeam', 'name')
                     ->label('Developer Team')
@@ -50,19 +48,21 @@ class WebsitesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('domain')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('is_waf_enabled')
-                    ->badge(),
+                Tables\Columns\IconColumn::make('is_waf_enabled')
+                    ->boolean()
+                    ->sortable()
+                    ->toggleable(),
                 Tables\Columns\TextColumn::make('techStacks.name')
                     ->badge(),
-                Tables\Columns\TextColumn::make('certificate.name'),
+                Tables\Columns\TextColumn::make('certificates.name'),
                 Tables\Columns\TextColumn::make('hosting.name'),
                 Tables\Columns\TextColumn::make('developerTeam.name'),
                 Tables\Columns\TextColumn::make('last_status')
                     ->badge(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('certificate')
-                    ->relationship('certificate', 'name'),
+                Tables\Filters\SelectFilter::make('certificates')
+                    ->relationship('certificates', 'name'),
                 Tables\Filters\SelectFilter::make('is_waf_enabled')
                     ->options([
                         true => 'Yes',
