@@ -10,8 +10,8 @@ return new class extends Migration
     {
         Schema::create('checks', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('website_id')->constrained()->cascadeOnDelete();
             $table->string('status')->nullable();
+            $table->foreignId('variation_id')->nullable()->constrained()->cascadeOnDelete();
             $table->text('notes')->nullable();
             $table->integer('number_of_retries')->default(0);
             $table->timestamps();

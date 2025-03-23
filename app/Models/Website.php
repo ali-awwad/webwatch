@@ -16,7 +16,6 @@ class Website extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'last_status' => Status::class,
         'is_waf_enabled' => 'boolean',
     ];
 

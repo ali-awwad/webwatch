@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\WebsiteResource\RelationManagers;
 
+use App\Enums\Status;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -22,6 +23,8 @@ class VariationsRelationManager extends RelationManager
                 Forms\Components\Select::make('certificate_id')
                     ->relationship('certificate', 'name')
                     ->searchable(),
+                Forms\Components\Select::make('status')
+                    ->options(Status::class),
                 Forms\Components\TextInput::make('redirect_to')
                     ->maxLength(255),
                 Forms\Components\Toggle::make('is_main')
@@ -38,6 +41,8 @@ class VariationsRelationManager extends RelationManager
                     ->searchable(),
                 Tables\Columns\TextColumn::make('certificate.name')
                     ->searchable()
+                    ->toggleable(),
+                Tables\Columns\TextColumn::make('status')
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('redirect_to')
                     ->toggleable(isToggledHiddenByDefault: true)

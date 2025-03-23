@@ -46,6 +46,10 @@ class ChecksRelationManager extends RelationManager
                     ->since()
                     ->dateTimeTooltip()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->since()
+                    ->dateTimeTooltip()
+                    ->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')

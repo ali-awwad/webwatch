@@ -17,10 +17,6 @@ return new class extends Migration
             $table->string('org');
             $table->timestamps();
         });
-
-        Schema::table('websites', function (Blueprint $table) {
-            $table->foreignId('hosting_id')->nullable()->constrained('hostings');
-        });
     }
 
     /**
@@ -28,11 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('websites', function (Blueprint $table) {
-            $table->dropForeign(['hosting_id']);
-            $table->dropColumn('hosting_id');
-        });
-
         Schema::dropIfExists('hostings');
     }
 };

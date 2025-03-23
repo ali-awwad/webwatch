@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\Status;
+use App\Models\Variation;
 use App\Models\Website;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -22,18 +23,18 @@ class ProblematicWebsitesWidget extends BaseWidget
             ->heading('Problematic Websites')
             ->description('Websites with status issues')
             ->query(
-                Website::query()
-                    ->whereNotIn('last_status', [Status::UP->value, Status::REDIRECT->value])
+                Variation::query()
+                    ->whereNotIn('status', [Status::UP->value, Status::REDIRECT->value])
                     ->latest('updated_at')
             )
             ->columns([
                 Tables\Columns\TextColumn::make('domain')
                     ->searchable()
-                    ->url(fn (Website $record): string => "https://{$record->domain}")
+                    ->url(fn (Variation $record): string => "https://{$record->name}")
                     ->openUrlInNewTab(),
-                Tables\Columns\TextColumn::make('company.name')
+                Tables\Columns\TextColumn::make('website.company.name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('last_status')
+                Tables\Columns\TextColumn::make('status')
                     ->badge(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()

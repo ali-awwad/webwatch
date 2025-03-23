@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\HostingResource\RelationManagers;
 
+use App\Enums\Status;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -25,6 +26,9 @@ class VariationsRelationManager extends RelationManager
                     ->relationship('website', 'domain')
                     ->required()
                     ->searchable(),
+                // status
+                Forms\Components\Select::make('status')
+                    ->options(Status::class),
                 Forms\Components\Select::make('certificate_id')
                     ->relationship('certificate', 'name')
                     ->searchable(),

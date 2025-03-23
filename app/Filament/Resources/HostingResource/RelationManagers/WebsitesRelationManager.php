@@ -43,8 +43,6 @@ class WebsitesRelationManager extends RelationManager
             ->columns([
                 Tables\Columns\TextColumn::make('domain')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('last_status')
-                    ->badge(),
                 Tables\Columns\IconColumn::make('is_waf_enabled')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')

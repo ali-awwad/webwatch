@@ -35,8 +35,6 @@ class WebsitesRelationManager extends RelationManager
                     ->searchable(),
                 Tables\Columns\TextColumn::make('company.name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('last_status')
-                    ->badge(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('company')

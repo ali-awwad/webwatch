@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +17,7 @@ class Variation extends Model
     
     protected $casts = [
         'is_main' => 'boolean',
+        'status' => Status::class,
     ];
     
     public function website(): BelongsTo
@@ -35,5 +38,19 @@ class Variation extends Model
     public function hosting(): BelongsTo
     {
         return $this->belongsTo(Hosting::class);
+    }
+
+    // scope main with status in array
+    public function scopeMainWithStatus(Builder $query, array|string $statuses): Builder
+    {
+        $query->where('is_main', true);
+
+        if (is_array($statuses)) {
+            $query->whereIn('status', $statuses);
+        } else {
+            $query->where('status', $statuses);
+        }
+
+        return $query;
     }
 } 

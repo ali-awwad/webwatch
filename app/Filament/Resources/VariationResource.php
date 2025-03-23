@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\Status;
 use App\Filament\Resources\VariationResource\Pages;
 use App\Models\Variation;
 use Filament\Forms;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Table;
 
 class VariationResource extends Resource
@@ -20,23 +23,29 @@ class VariationResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('website_id')
-                    ->relationship('website', 'domain')
-                    ->required()
-                    ->searchable(),
-                Forms\Components\Select::make('certificate_id')
-                    ->relationship('certificate', 'name')
-                    ->searchable(),
-                Forms\Components\Select::make('hosting_id')
-                    ->relationship('hosting', 'name')
-                    ->searchable(),
-                Forms\Components\TextInput::make('redirect_to')
-                    ->maxLength(255),
-                Forms\Components\Toggle::make('is_main')
-                    ->required(),
+                Section::make('Website Information')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Select::make('website_id')
+                            ->relationship('website', 'domain')
+                            ->required()
+                            ->searchable(),
+                        Forms\Components\Select::make('certificate_id')
+                            ->relationship('certificate', 'name')
+                            ->searchable(),
+                        Forms\Components\Select::make('hosting_id')
+                            ->relationship('hosting', 'name')
+                            ->searchable(),
+                        Forms\Components\TextInput::make('redirect_to')
+                            ->maxLength(255),
+                        Forms\Components\Toggle::make('is_main')
+                            ->required(),
+                        Forms\Components\Textarea::make('notes')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -54,6 +63,9 @@ class VariationResource extends Resource
                 Tables\Columns\TextColumn::make('hosting.name')
                     ->searchable()
                     ->toggleable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->sortable()
+                    ->badge(),
                 Tables\Columns\TextColumn::make('redirect_to')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->limit(20)
@@ -76,7 +88,12 @@ class VariationResource extends Resource
                 Tables\Filters\SelectFilter::make('hosting')
                     ->relationship('hosting', 'name'),
                 Tables\Filters\TernaryFilter::make('is_main'),
+                Tables\Filters\SelectFilter::make('status')
+                    ->options(Status::class)
+                    ->multiple(),
             ])
+            ->filtersFormColumns(2)
+            ->filtersLayout(FiltersLayout::Modal)
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
@@ -103,4 +120,4 @@ class VariationResource extends Resource
             'edit' => Pages\EditVariation::route('/{record}/edit'),
         ];
     }
-} 
+}

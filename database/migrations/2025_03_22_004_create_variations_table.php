@@ -12,8 +12,12 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignId('website_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('hosting_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('certificate_id')->nullable()->constrained()->nullOnDelete();
             $table->boolean('is_main')->default(false);
             $table->string('redirect_to')->nullable();
+            $table->string('notes')->nullable();
+            $table->string('status')->nullable();
             $table->timestamps();
         });
     }

@@ -57,8 +57,6 @@ class WebsitesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('certificates.name'),
                 Tables\Columns\TextColumn::make('hosting.name'),
                 Tables\Columns\TextColumn::make('developerTeam.name'),
-                Tables\Columns\TextColumn::make('last_status')
-                    ->badge(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('certificates')

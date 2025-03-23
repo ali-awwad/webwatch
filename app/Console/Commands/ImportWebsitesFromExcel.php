@@ -21,7 +21,7 @@ class ImportWebsitesFromExcel extends Command
     public function handle()
     {
         $filePath = $this->argument('file');
-        
+
         if (!file_exists($filePath)) {
             $this->error("File not found: {$filePath}");
             return 1;
@@ -31,28 +31,28 @@ class ImportWebsitesFromExcel extends Command
             $spreadsheet = IOFactory::load($filePath);
             $worksheet = $spreadsheet->getActiveSheet();
             $rows = $worksheet->toArray();
-            
+
             // Remove header row
             $header = array_shift($rows);
-            
+
             // Map column indexes
             $columnMap = $this->mapColumns($header);
-            
+
             $this->info('Starting import process...');
             $this->withProgressBar($rows, function ($row) use ($columnMap) {
                 $this->processRow($row, $columnMap);
             });
-            
+
             $this->newLine(2);
             $this->info('Import completed successfully!');
-            
+
             return 0;
         } catch (\Exception $e) {
             $this->error("Error importing file: " . $e->getMessage());
             return 1;
         }
     }
-    
+
     private function mapColumns(array $header): array
     {
         $map = [];
@@ -78,7 +78,7 @@ class ImportWebsitesFromExcel extends Command
         }
         return $map;
     }
-    
+
     private function processRow(array $row, array $columnMap): void
     {
         DB::transaction(function () use ($row, $columnMap) {
@@ -88,7 +88,7 @@ class ImportWebsitesFromExcel extends Command
             $technology = $row[$columnMap['technology']] ?? null;
             $waf = $row[$columnMap['waf']] ?? null;
             $notes = $row[$columnMap['notes']] ?? null;
-            
+
             if (empty($domain) || empty($companyName)) {
                 return; // Skip rows without domain or company
             }
@@ -96,16 +96,16 @@ class ImportWebsitesFromExcel extends Command
             // Get the first word from the company name and find a matching division
             $firstWord = explode(' ', $companyName)[0];
             $division = Division::firstOrCreate(['name' => $firstWord]);
-            
-            if(!$division) {
+
+            if (!$division) {
                 $this->error("Division not found for company: {$companyName}");
                 return;
             }
-            
+
             // Find or create company based on Cluster name
             $company = Company::updateOrCreate(['name' => $companyName], ['division_id' => $division->id]);
-            
-            
+
+
             // Create the website
             $website = Website::updateOrCreate(
                 ['domain' => $domain],
@@ -115,63 +115,63 @@ class ImportWebsitesFromExcel extends Command
                     'is_waf_enabled' => $this->parseWafValue($waf),
                 ]
             );
-            
+
             // Process technologies
             if (!empty($technology)) {
                 $techNames = array_map('trim', explode(',', $technology));
                 $techStackIds = [];
-                
+
                 foreach ($techNames as $techName) {
                     if (!empty($techName)) {
                         $techStack = TechStack::firstOrCreate(['name' => $techName]);
                         $techStackIds[] = $techStack->id;
                     }
                 }
-                
+
                 // Sync technologies with the website
                 $website->techStacks()->sync($techStackIds);
+            }
 
-                // assign developer team to the website
-                $developerTeam = DeveloperTeam::firstOrCreate(['name' => 'IT Digital']);
-                $website->developerTeam()->associate($developerTeam);
-                $website->save();
+            // assign developer team to the website
+            $developerTeam = DeveloperTeam::firstOrCreate(['name' => 'IT Digital']);
+            $website->developerTeam()->associate($developerTeam);
+            $website->save();
 
-                // create variation for the website
+            // create variation for the website
 
-                $variationNames = [$domain];
-                
-                // if is apex domain, add www. to the variation names
-                if (strpos($domain, '.') === strrpos($domain, '.')) {
-                    $variationNames[] = 'www.' . $domain;
-                }
+            $variationNames = [$domain];
 
-                foreach ($variationNames as $variationName) {
-                    Variation::create([
-                        'website_id' => $website->id,
-                        'is_main' => Str::startsWith($variationName, 'www.'),
-                        'name' => $variationName,
-                    ]);
-                }
+            // if is apex domain, add www. to the variation names
+            if (strpos($domain, '.') === strrpos($domain, '.')) {
+                $variationNames[] = 'www.' . $domain;
+            }
+
+            foreach ($variationNames as $variationName) {
+                Variation::create([
+                    'website_id' => $website->id,
+                    'is_main' => Str::startsWith($variationName, 'www.') || count($variationNames) === 1,
+                    'name' => $variationName,
+                ]);
             }
         });
     }
-    
+
     private function parseWafValue($waf): ?bool
     {
         if (empty($waf)) {
             return null;
         }
-        
+
         $waf = strtolower(trim($waf));
-        
+
         if (in_array($waf, ['yes', 'y', 'true', '1', 'enabled', 'on'])) {
             return true;
         }
-        
+
         if (in_array($waf, ['no', 'n', 'false', '0', 'disabled', 'off'])) {
             return false;
         }
-        
+
         return null;
     }
-} 
+}

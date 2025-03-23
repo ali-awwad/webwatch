@@ -7,6 +7,7 @@ use App\Models\Variation;
 use App\Models\Website;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class FindHosting extends Command
 {
@@ -14,13 +15,15 @@ class FindHosting extends Command
 
     public function handle()
     {
-        $variations = Variation::get();
+        $variations = Variation::whereHas('website', function ($query) {
+            $query->where('is_skipped', false);
+        })->get();
 
         /**
          * @var \App\Models\Variation $variation
          */
         foreach ($variations as $variation) {
-            $domain = $variation->name;
+            $domain = Str::before($variation->name, '/');
             $this->info("Checking: $domain");
 
             try {
@@ -29,6 +32,12 @@ class FindHosting extends Command
 
                 if ($ip === $domain) {
                     $this->error("Could not resolve IP for $domain");
+                    $hosting = Hosting::firstOrCreate([
+                        'name' => 'Unknown',
+                        'org' => 'Unknown',
+                    ]);
+                    $variation->hosting_id = $hosting->id;
+                    $variation->save();
                     continue;
                 }
 

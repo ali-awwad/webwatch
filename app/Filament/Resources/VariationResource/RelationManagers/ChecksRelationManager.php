@@ -39,6 +39,11 @@ class ChecksRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('number_of_retries'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->since()
+                    ->dateTimeTooltip()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->since()
+                    ->dateTimeTooltip()
                     ->sortable(),
             ])
             ->filters([

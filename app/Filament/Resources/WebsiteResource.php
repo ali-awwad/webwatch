@@ -43,6 +43,11 @@ class WebsiteResource extends Resource
                             ->label('Is WAF Enabled')
                             ->inline()
                             ->boolean(),
+                        Forms\Components\ToggleButtons::make('is_skipped')
+                            ->label('Is Skipped')
+                            ->hint('If the website is skipped, it will not be checked')
+                            ->inline()
+                            ->boolean(),
                         Forms\Components\Select::make('techStacks')
                             ->relationship('techStacks', 'name')
                             ->multiple()
@@ -71,10 +76,6 @@ class WebsiteResource extends Resource
                     ->searchable(query: function (Builder $query, string $search): Builder {
                         return $query->where('name', 'like', "%{$search}%");
                     }),
-                Tables\Columns\TextColumn::make('last_status')
-                    ->badge()
-                    ->sortable()
-                    ->toggleable(),
                 Tables\Columns\IconColumn::make('is_waf_enabled')
                     ->sortable()
                     ->toggleable(),
@@ -115,7 +116,15 @@ class WebsiteResource extends Resource
                         });
                     })
                     ,
-
+                Tables\Columns\IconColumn::make('is_skipped')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->label('Skipped')
+                    ->boolean(),
+                Tables\Columns\TextColumn::make('variations_count')
+                    ->counts('variations')
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable()
+                    ->label('Variations'),
                 Tables\Columns\TextColumn::make('checks_count')
                     ->counts('checks')
                     ->toggleable(isToggledHiddenByDefault: true)
@@ -156,10 +165,12 @@ class WebsiteResource extends Resource
                     ->multiple()
                     ->searchable()
                     ->preload(),
-                Tables\Filters\SelectFilter::make('last_status')
-                    ->multiple()
-                    ->options(Status::class),
                 Tables\Filters\SelectFilter::make('is_waf_enabled')
+                    ->options([
+                        true => 'Yes',
+                        false => 'No',
+                    ]),
+                Tables\Filters\SelectFilter::make('is_skipped')
                     ->options([
                         true => 'Yes',
                         false => 'No',

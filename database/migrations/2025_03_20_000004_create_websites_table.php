@@ -12,10 +12,9 @@ return new class extends Migration
             $table->id();
             $table->string('domain');
             $table->foreignId('company_id')->constrained()->cascadeOnDelete();
-            $table->string('last_status')->nullable();
-            $table->foreignId('certificate_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('developer_team_id')->nullable()->constrained()->nullOnDelete();
             $table->text('notes')->nullable();
+            $table->boolean('is_skipped')->default(false);
             $table->boolean('is_waf_enabled')->nullable();
 
             $table->timestamps();

@@ -22,7 +22,6 @@ class WebsiteFactory extends Factory
         return [
             'domain' => fake()->domainName(),
             'company_id' => Company::factory(),
-            'last_status' => fake()->randomElement(Status::cases()),
             'developer_team_id' => DeveloperTeam::factory(),
         ];
     }
