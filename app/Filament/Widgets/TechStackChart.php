@@ -10,13 +10,14 @@ class TechStackChart extends ChartWidget
 {
     protected static ?string $heading = 'Tech Stack Distribution';
     
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 20;
 
     protected function getData(): array
     {
         $data = DB::table('tech_stack_website')
             ->join('tech_stacks', 'tech_stacks.id', '=', 'tech_stack_website.tech_stack_id')
             ->select('tech_stacks.name', DB::raw('count(*) as total'))
+            ->orderByDesc('total')
             ->groupBy('tech_stacks.name')
             ->get();
 

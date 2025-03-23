@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 class ProblematicWebsitesWidget extends BaseWidget
 {
     protected static ?string $model = Website::class;
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 70;
     protected int|string|array $columnSpan = 'full';
 
 
@@ -28,16 +28,17 @@ class ProblematicWebsitesWidget extends BaseWidget
                     ->latest('updated_at')
             )
             ->columns([
-                Tables\Columns\TextColumn::make('domain')
-                    ->searchable()
+                Tables\Columns\TextColumn::make('name')
+                    ->limit(30)
+                    ->tooltip(fn ($state): string => $state)
                     ->url(fn (Variation $record): string => "https://{$record->name}")
                     ->openUrlInNewTab(),
-                Tables\Columns\TextColumn::make('website.company.name')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('website.company.name'),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
+                    ->since()
+                    ->dateTimeTooltip()
                     ->sortable(),
             ])
             ->actions([

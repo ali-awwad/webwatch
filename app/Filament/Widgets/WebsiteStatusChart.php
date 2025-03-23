@@ -10,7 +10,7 @@ use Filament\Widgets\ChartWidget;
 class WebsiteStatusChart extends ChartWidget
 {
     protected static ?string $heading = 'Website Status History';
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 60;
     protected int|string|array $columnSpan = 'full';
     
     protected function getData(): array

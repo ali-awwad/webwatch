@@ -10,7 +10,7 @@ class DeveloperTeamChart extends ChartWidget
 {
     protected static ?string $heading = 'Developer Team Distribution';
     
-    protected static ?int $sort = 3;
+    protected static ?int $sort = 50;
 
     protected function getData(): array
     {

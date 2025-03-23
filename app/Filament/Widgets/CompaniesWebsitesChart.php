@@ -10,7 +10,7 @@ class CompaniesWebsitesChart extends ChartWidget
 {
     protected static ?string $heading = 'Companies by Website Count';
 
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 30;
 
     protected function getData(): array
     {

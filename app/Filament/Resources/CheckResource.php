@@ -42,8 +42,12 @@ class CheckResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('variation.name')
+                    ->limit(40)
+                    ->tooltip(fn ($state): string => $state)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('variation.website.domain')
+                    ->limit(40)
+                    ->tooltip(fn ($state): string => $state)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),

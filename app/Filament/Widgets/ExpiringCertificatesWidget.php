@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ExpiringCertificatesWidget extends BaseWidget
 {
-    protected static ?int $sort = 4;
+    protected static ?int $sort = 80;
     protected int|string|array $columnSpan = 'full';
 
     public function table(Table $table): Table
@@ -25,8 +25,7 @@ class ExpiringCertificatesWidget extends BaseWidget
                     ->limit(5)
             )
             ->columns([
-                Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('valid_to')
                     ->dateTime('d M Y')
                     ->sortable()
@@ -43,7 +42,13 @@ class ExpiringCertificatesWidget extends BaseWidget
                 Tables\Columns\TextColumn::make('websites.domain')
                     //->counts('websites')
                     // comma separates websites by their domain
-                    ->limit(150)
+                    ->getStateUsing(function ($record) {
+                        return $record->websites->pluck('domain')->implode(', ');
+                    })
+                    ->limit(40)
+                    ->tooltip(function ($record) {
+                        return $record->websites->pluck('domain')->implode(', ');
+                    })
                     ->label('Affected Websites'),
             ])
             ->actions([

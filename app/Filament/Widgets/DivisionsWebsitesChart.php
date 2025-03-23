@@ -10,7 +10,7 @@ class DivisionsWebsitesChart extends ChartWidget
 {
     protected static ?string $heading = 'Divisions by Website Count';
 
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 40;
 
     protected function getData(): array
     {

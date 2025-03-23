@@ -54,13 +54,21 @@ class VariationResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->limit(40)
+                    ->tooltip(fn ($state): string => $state)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('website.domain')
+                    ->limit(40)
+                    ->tooltip(fn ($state): string => $state)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('certificate.name')
+                    ->limit(40)
+                    ->tooltip(fn ($state): string => $state)
                     ->searchable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('hosting.name')
+                    ->limit(40)
+                    ->tooltip(fn ($state): string => $state)
                     ->searchable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('status')
