@@ -180,12 +180,24 @@ class WebsiteResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\Action::make('check')
+                    ->label('Check')
+                    ->color('success')
+                    ->icon('heroicon-o-arrow-path')
+                    ->requiresConfirmation()
                     ->action(function (Website $record) {
                         CheckWebsiteJob::dispatch($record);
                         Notification::make()
                         ->success()
                         ->title('Check Started')
                         ->send();
+                    }),
+                Tables\Actions\Action::make('skip')
+                    ->label('Skip')
+                    ->color('warning')
+                    ->icon('heroicon-o-arrow-right')
+                    ->requiresConfirmation()
+                    ->action(function (Website $record) {
+                        $record->update(['is_skipped' => true]);
                     }),
             ])
             ->bulkActions([

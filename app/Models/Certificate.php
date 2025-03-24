@@ -27,14 +27,4 @@ class Certificate extends Model
     {
         return $this->hasManyThrough(Website::class, Variation::class, 'certificate_id', 'id', 'id', 'website_id');
     }
-
-    public function divisions(): HasManyThrough
-    {
-        return $this->hasManyThrough(Division::class, Website::class, 'id', 'id', 'id', 'company_id');
-    }
-
-    public function hosting(): HasManyThrough
-    {
-        return $this->hasManyThrough(Hosting::class, Website::class, 'id', 'id', 'id', 'hosting_id');
-    }
 } 

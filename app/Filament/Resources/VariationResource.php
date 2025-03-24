@@ -4,10 +4,12 @@ namespace App\Filament\Resources;
 
 use App\Enums\Status;
 use App\Filament\Resources\VariationResource\Pages;
+use App\Jobs\CheckWebsiteJob;
 use App\Models\Variation;
 use Filament\Forms;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Enums\FiltersLayout;
@@ -63,7 +65,7 @@ class VariationResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('certificate.name')
                     ->limit(40)
-                    ->tooltip(fn ($state): string => $state)
+                    ->tooltip(fn ($state): ?string => $state)
                     ->searchable()
                     ->toggleable(),
                 Tables\Columns\TextColumn::make('hosting.name')
@@ -105,10 +107,32 @@ class VariationResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                // check
+                Tables\Actions\Action::make('check')
+                    ->label('Check')
+                    ->color('success')
+                    ->icon('heroicon-o-arrow-path')
+                    ->requiresConfirmation()
+                    ->action(function (Variation $record) {
+                        CheckWebsiteJob::dispatch($record);
+                        Notification::make()
+                            ->title('Check Started')
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('check')
+                        ->label('Check')
+                        ->color('success')
+                        ->icon('heroicon-o-arrow-path')
+                        ->requiresConfirmation()
+                        ->action(function ($records) {
+                            foreach ($records as $record) {
+                                CheckWebsiteJob::dispatch($record);
+                            }
+                        }),
                 ]),
             ]);
     }

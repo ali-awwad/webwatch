@@ -65,7 +65,8 @@ trait HasGlobalFilters
             ->join('hostings', 'variations.hosting_id', '=', 'hostings.id')
             ->join('developer_teams', 'websites.developer_team_id', '=', 'developer_teams.id')
             ->join('tech_stack_website', 'websites.id', '=', 'tech_stack_website.website_id')
-            ->join('tech_stacks', 'tech_stack_website.tech_stack_id', '=', 'tech_stacks.id');
+            ->join('tech_stacks', 'tech_stack_website.tech_stack_id', '=', 'tech_stacks.id')
+            ->where('websites.is_skipped', false);
 
         if ($this->divisions) {
             $query->whereIn('companies.division_id', $this->divisions);

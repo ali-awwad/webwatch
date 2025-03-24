@@ -11,6 +11,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use App\Filament\Resources\CertificateResource\RelationManagers;
 use App\Models\Division;
+use Illuminate\Database\Eloquent\Builder;
+use App\Models\Company;
 
 class CertificateResource extends Resource
 {
@@ -90,7 +92,45 @@ class CertificateResource extends Resource
             ])
             ->defaultSort('valid_to', 'asc')
             ->filters([
+                Tables\Filters\Filter::make('division')
+                    ->form([
+                        Forms\Components\Select::make('division_id')
+                            ->label('Division')
+                            ->options(Division::pluck('name', 'id'))
+                            ->multiple()
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['division_id'],
+                                function (Builder $query, $divisionIds): Builder {
+                                    return $query->whereHas('websites', function ($query) use ($divisionIds) {
+                                        $query->whereHas('company', function ($query) use ($divisionIds) {
+                                            $query->whereIn('division_id', $divisionIds);
+                                        });
+                                    });
+                                }
+                            );
+                    }),
                 
+                Tables\Filters\Filter::make('company')
+                    ->form([
+                        Forms\Components\Select::make('company_id')
+                            ->label('Company')
+                            ->options(Company::pluck('name', 'id'))
+                            ->multiple()
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['company_id'],
+                                function (Builder $query, $companyIds): Builder {
+                                    return $query->whereHas('websites', function ($query) use ($companyIds) {
+                                        $query->whereIn('company_id', $companyIds);
+                                    });
+                                }
+                            );
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
