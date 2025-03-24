@@ -3,28 +3,31 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Division;
+use App\Filament\Traits\HasGlobalFilters;
+use App\Models\Website;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
 class DivisionsWebsitesChart extends ChartWidget
 {
+    use HasGlobalFilters;
     protected static ?string $heading = 'Divisions by Website Count';
 
     protected static ?int $sort = 40;
 
     protected function getData(): array
     {
-        // get all divisions with the count of websites through the companies
-        $divisions = Division::withCount('websites')
-            ->orderByDesc('websites_count')
-            ->limit(10)
+        $websites = $this->getVariationsQuery()
+            ->where('variations.is_main', true)
+            ->select('divisions.name as division_name', DB::raw('COUNT(websites.id) as count'))
+            ->groupBy('divisions.name')
             ->get();
 
         return [
             'datasets' => [
                 [
                     'label' => 'Websites Count',
-                    'data' => $divisions->pluck('websites_count')->toArray(),
+                    'data' => $websites->pluck('count')->toArray(),
                     'backgroundColor' => [
                         'rgba(255, 99, 132, 0.7)',
                         'rgba(54, 162, 235, 0.7)',
@@ -39,7 +42,7 @@ class DivisionsWebsitesChart extends ChartWidget
                     ],
                 ],
             ],
-            'labels' => $divisions->pluck('name')->toArray(),
+            'labels' => $websites->pluck('division_name')->toArray(),
         ];
     }
 
@@ -58,4 +61,4 @@ class DivisionsWebsitesChart extends ChartWidget
             ],
         ];
     }
-} 
+}

@@ -23,6 +23,6 @@ class Check extends Model
     
     public function website()
     {
-        return $this->variation->website();
+        return $this->variation?->website();
     }
 } 

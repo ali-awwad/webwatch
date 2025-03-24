@@ -53,4 +53,9 @@ class Variation extends Model
 
         return $query;
     }
+
+    public function scopeMain(Builder $query): Builder
+    {
+        return $query->where('is_main', true);
+    }
 } 

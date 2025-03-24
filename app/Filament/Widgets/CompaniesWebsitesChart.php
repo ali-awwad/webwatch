@@ -2,28 +2,34 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Traits\HasGlobalFilters;
 use App\Models\Company;
+use App\Models\Website;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Facades\DB;
 
 class CompaniesWebsitesChart extends ChartWidget
 {
+    use HasGlobalFilters;
+    
     protected static ?string $heading = 'Companies by Website Count';
 
     protected static ?int $sort = 30;
 
     protected function getData(): array
     {
-        $companies = Company::withCount('websites')
-            ->orderByDesc('websites_count')
-            ->limit(10)
+        $websites = $this->getVariationsQuery()
+            ->where('variations.is_main', true)
+            ->select('companies.name as company_name', DB::raw('COUNT(websites.id) as count'))
+            ->groupBy('companies.name')
+            ->orderByDesc('count') 
             ->get();
 
         return [
             'datasets' => [
                 [
                     'label' => 'Websites Count',
-                    'data' => $companies->pluck('websites_count')->toArray(),
+                    'data' => $websites->pluck('count')->toArray(),
                     'backgroundColor' => [
                         'rgba(255, 99, 132, 0.7)',
                         'rgba(54, 162, 235, 0.7)',
@@ -38,7 +44,7 @@ class CompaniesWebsitesChart extends ChartWidget
                     ],
                 ],
             ],
-            'labels' => $companies->pluck('name')->toArray(),
+            'labels' => $websites->pluck('company_name')->toArray(),
         ];
     }
 

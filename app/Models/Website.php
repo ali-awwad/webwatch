@@ -24,6 +24,11 @@ class Website extends Model
         return $this->belongsTo(Company::class);
     }
 
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(Division::class, 'company_id', 'id');
+    }
+
     public function checks(): HasManyThrough
     {
         return $this->hasManyThrough(Check::class, Variation::class);

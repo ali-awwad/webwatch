@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\Status;
+use App\Filament\Traits\HasGlobalFilters;
 use App\Models\Variation;
 use App\Models\Website;
 use Filament\Tables;
@@ -12,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ProblematicWebsitesWidget extends BaseWidget
 {
+    use HasGlobalFilters;
     protected static ?string $model = Website::class;
     protected static ?int $sort = 70;
     protected int|string|array $columnSpan = 'full';
@@ -23,8 +25,10 @@ class ProblematicWebsitesWidget extends BaseWidget
             ->heading('Problematic Websites')
             ->description('Websites with status issues')
             ->query(
-                Variation::query()
+                $this->getVariationsQuery(false)
                     ->whereNotIn('status', [Status::UP->value, Status::REDIRECT->value])
+                    ->with(['website', 'website.company'])
+                    ->select('variations.*')
                     ->latest('updated_at')
             )
             ->columns([

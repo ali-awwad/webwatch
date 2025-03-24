@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use App\Filament\Resources\CertificateResource\RelationManagers;
+use App\Models\Division;
 
 class CertificateResource extends Resource
 {
@@ -89,7 +90,7 @@ class CertificateResource extends Resource
             ])
             ->defaultSort('valid_to', 'asc')
             ->filters([
-                //
+                
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

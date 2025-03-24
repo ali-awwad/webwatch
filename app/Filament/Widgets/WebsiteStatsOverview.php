@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\Status;
+use App\Filament\Traits\HasGlobalFilters;
 use App\Models\Certificate;
 use App\Models\Variation;
 use App\Models\Website;
@@ -11,35 +12,36 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class WebsiteStatsOverview extends BaseWidget
 {
+    use HasGlobalFilters;
     protected static ?int $sort = 10;
 
     protected function getStats(): array
     {
-        $totalActiveWebsites = Website::whereIsSkipped(false)->has('variations')->count();
-        $inActiveWebsites = Website::whereIsSkipped(true)->count();
+        $totalWebsites = $this->getVariationsQuery()->count();
+        $skippedWebsites = $this->getVariationsQuery()->whereIsSkipped(true)->count();
 
-        $upWebsites = Variation::mainWithStatus(Status::UP->value)->count();
-        $downWebsites = Variation::mainWithStatus(Status::DOWN->value)->count();
-        $redirects = Variation::mainWithStatus(Status::REDIRECT->value)->count();
+        $upWebsites = $this->getVariationsQuery()->where('status', Status::UP->value)->count();
+        $downWebsites = $this->getVariationsQuery()->where('status', Status::DOWN->value)->count();
+        $redirects = $this->getVariationsQuery()->where('status', Status::REDIRECT->value)->count();
 
 
-        $sslIssues = Variation::whereIn('status', [Status::SSL_ISSUE->value, Status::SSL_EXPIRED->value, Status::SSL_EXPIRING_SOON->value])->count();
+        $sslIssues = $this->getVariationsQuery()->whereIn('status', [Status::SSL_ISSUE->value, Status::SSL_EXPIRED->value, Status::SSL_EXPIRING_SOON->value])->count();
 
         // Calculate percentages
-        $upPercentage = $totalActiveWebsites > 0 ? round(($upWebsites / ($totalActiveWebsites)) * 100) : 0;
+        $upPercentage = $totalWebsites > 0 ? round(($upWebsites / ($totalWebsites)) * 100) : 0;
 
         // calculate the percentage of redirects
-        $redirectsPercentage = $totalActiveWebsites > 0 ? round(($redirects / ($totalActiveWebsites)) * 100) : 0;
+        $redirectsPercentage = $totalWebsites > 0 ? round(($redirects / ($totalWebsites)) * 100) : 0;
 
         // expiring or expired ssl certificates
         // valid_to in the next 30 days ( or expired )
         $expiredOrExpiringSslCertificates = Certificate::where('valid_to', '<=', now()->addDays(60))->count();
-        $expiredOrExpiringSslCertificatesPercentage = $totalActiveWebsites > 0 ? round(($expiredOrExpiringSslCertificates / ($totalActiveWebsites)) * 100) : 0;
+        $expiredOrExpiringSslCertificatesPercentage = $totalWebsites > 0 ? round(($expiredOrExpiringSslCertificates / ($totalWebsites)) * 100) : 0;
 
 
         return [
-            Stat::make('Total Websites', $totalActiveWebsites)
-                ->description($inActiveWebsites > 0 ? $inActiveWebsites . ' inactive websites' : '')
+            Stat::make('Total Websites', $totalWebsites)
+                ->description($skippedWebsites > 0 ? $skippedWebsites . ' skipped websites' : '')
                 ->descriptionIcon('heroicon-o-globe-alt')
                 ->icon('heroicon-o-globe-alt'),
 
