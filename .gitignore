@@ -22,3 +22,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+.DS_Store
+*.DS_Store
+app/Console/Commands/PopulateInitialData.php

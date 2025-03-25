@@ -20,6 +20,7 @@ class ExpiringCertificatesWidget extends BaseWidget
             ->description('SSL certificates that are about to expire or already expired')
             ->query(
                 Certificate::query()
+                    ->has('websites')
                     ->where('valid_to', '<=', now()->addDays(30000))
                     ->orderBy('valid_to')
                     ->limit(5)

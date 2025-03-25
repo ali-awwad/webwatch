@@ -83,6 +83,12 @@ class VariationResource extends Resource
                     ->searchable(),
                 Tables\Columns\IconColumn::make('is_main')
                     ->boolean(),
+
+                Tables\Columns\TextColumn::make('website.techStacks')
+                    ->label('Tech Stack')
+                    ->getStateUsing(fn($record) => $record->website->techStacks->pluck('name')->implode(', '))
+                    ->limit(20)
+                    ->tooltip(fn($record) => $record->website->techStacks->pluck('name')->implode(', ')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -100,6 +106,10 @@ class VariationResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_main'),
                 Tables\Filters\SelectFilter::make('status')
                     ->options(Status::class)
+                    ->multiple(),
+                Tables\Filters\SelectFilter::make('website.techStacks')
+                    ->label('Tech Stack')
+                    ->relationship('website.techStacks', 'name')
                     ->multiple(),
             ])
             ->filtersFormColumns(2)

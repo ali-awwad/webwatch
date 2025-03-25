@@ -21,8 +21,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            'name' => 'Ali Awwad',
-            'email' => 'a.awwad@outlook.com',
+            'name' => 'Test Account',
+            'email' => 'admin@example.com',
         ]);
 
        // // Create divisions
